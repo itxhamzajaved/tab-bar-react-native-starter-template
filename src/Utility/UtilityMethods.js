@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CommonActions } from "@react-navigation/native";
 import { Dimensions, PixelRatio, Platform } from "react-native";
 import ImagePicker from "react-native-image-crop-picker";
@@ -22,6 +21,85 @@ class UtilityMethods {
   wp = (width) => {
     const elemWidth = typeof width === "number" ? width : parseFloat(width);
     return PixelRatio.roundToNearestPixel((screenWidth * elemWidth) / 100);
+  };
+
+  /**
+   * Returns true if the given string only contain letters
+   *
+   * @param {*} str
+   * @return {*}
+   * @memberof UtilityMethods
+   */
+  hasOnlyLetters(str) {
+    let result = /^[\p{L} ,.'-]+$/u.test(str);
+    console.log(result);
+    return result;
+  }
+
+  /**
+   * Parse JSON string or throw error
+   */
+  parseJSON = (data) => {
+    data = data || "";
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      throw new Error({
+        type: "JSON.parse",
+        message: error.stack,
+        reason: error.message,
+      });
+    }
+  };
+  /**
+   * Safely parse JSON strings (no errors)
+   */
+  toJSON = (data) => {
+    data = data || "";
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      return {
+        type: "JSON.parse",
+        message: error.stack,
+        reason: error.message,
+      };
+    }
+  };
+
+  /**
+   * Check empty object
+   */
+  checkEmptyObject = (obj) => {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) return false;
+    }
+    return true;
+  };
+
+  /**
+   * Check if the variable is undefined
+   */
+  isUndefined = (data) => {
+    if (data === "undefined") {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Helper function to convert bytes to size
+   *
+   * @param {*} bytes
+   * @memberof UtilityMethods
+   */
+  bytesToSize = (bytes) => {
+    if (bytes === 0) return "0 B";
+
+    var k = 1024;
+    var sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toPrecision(3) + " " + sizes[i];
   };
 
   /**
@@ -164,93 +242,6 @@ class UtilityMethods {
         callback(images);
       });
     }
-  };
-
-  /**
-   * Helper Function for storing String Data in the async storage
-   *
-   * @param {*} key
-   * @param {*} value
-   * @memberof UtilityMethods
-   */
-  storeStringData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (e) {}
-  };
-
-  /**
-   * Helper Function for retrieving a String Data from the async storage
-   *
-   * @param {*} key
-   * @memberof UtilityMethods
-   */
-  getStringData = async (key) => {
-    try {
-      let value = await AsyncStorage.getItem(key);
-      return value;
-    } catch (e) {
-      return null;
-    }
-  };
-
-  /**
-   * Helper Function for storing a Json Data in the async storage
-   *
-   * @param {*} key
-   * @param {*} value
-   * @memberof UtilityMethods
-   */
-  storeJsonData = async (key, value) => {
-    try {
-      const jsonValue = value === null ? null : JSON.stringify(value);
-      await AsyncStorage.setItem(key, jsonValue);
-    } catch (e) {
-      return null;
-    }
-  };
-
-  /**
-   * Helper Function for retrieving a Json Data from the async storage
-   *
-   * @param {*} key
-   * @memberof UtilityMethods
-   */
-  getJsonData = async (key) => {
-    try {
-      let jsonValue = await AsyncStorage.getItem(key);
-      jsonValue = jsonValue != null ? JSON.parse(jsonValue) : null;
-      return jsonValue;
-    } catch (e) {
-      return null;
-    }
-  };
-
-  /**
-   * Helper Function for removing data from async storage
-   *
-   * @param {*} key
-   * @memberof UtilityMethods
-   */
-  removeAsyncItem = async (key) => {
-    try {
-      await AsyncStorage.removeItem(key);
-    } catch (e) {}
-  };
-
-  /**
-   * Helper Function for checking json value
-   *
-   * @param {*} str
-   * @memberof UtilityMethods
-   */
-  isJson = (str) => {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
-    }
-    return true;
   };
 
   hex2rgba = (hex, alpha = 1) => {
